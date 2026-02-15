@@ -24,7 +24,6 @@ export function TrendChart({ trend }: TrendChartProps) {
     .map((y) => ({
       year: y.year,
       avgPrice: y.avgPrice,
-      medianPrice: y.medianPrice,
     }));
 
   if (chartData.length === 0) {
@@ -54,14 +53,6 @@ export function TrendChart({ trend }: TrendChartProps) {
             strokeWidth={2}
             dot={false}
             name="Average"
-          />
-          <Line
-            type="monotone"
-            dataKey="medianPrice"
-            stroke="#9333ea"
-            strokeWidth={2}
-            dot={false}
-            name="Median"
           />
         </LineChart>
       </ResponsiveContainer>

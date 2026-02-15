@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UK House Price Map - Project Presentation</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #0f172a; color: #e2e8f0; }
+
+    .slide {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 120px;
+      border-bottom: 1px solid #1e293b;
+      position: relative;
+    }
+
+    .slide-number {
+      position: absolute;
+      bottom: 30px;
+      right: 60px;
+      font-size: 14px;
+      color: #475569;
+    }
+
+    .slide.title { text-align: center; padding: 60px; }
+    .slide.title h1 { font-size: 64px; font-weight: 800; color: #f8fafc; margin-bottom: 16px; line-height: 1.1; }
+    .slide.title .subtitle { font-size: 28px; color: #94a3b8; margin-bottom: 48px; }
+    .slide.title .meta { font-size: 18px; color: #64748b; }
+
+    h2 { font-size: 42px; font-weight: 700; color: #f8fafc; margin-bottom: 40px; }
+    h3 { font-size: 24px; font-weight: 600; color: #38bdf8; margin-bottom: 16px; margin-top: 32px; }
+
+    p { font-size: 22px; line-height: 1.6; color: #cbd5e1; margin-bottom: 16px; max-width: 900px; }
+
+    ul { list-style: none; padding: 0; }
+    ul li {
+      font-size: 22px; line-height: 1.6; color: #cbd5e1;
+      padding: 8px 0; padding-left: 32px; position: relative;
+    }
+    ul li::before {
+      content: ''; position: absolute; left: 0; top: 18px;
+      width: 12px; height: 12px; border-radius: 50%; background: #38bdf8;
+    }
+
+    .highlight { color: #38bdf8; font-weight: 600; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
+
+    .card {
+      background: #1e293b; border-radius: 12px; padding: 32px; border: 1px solid #334155;
+    }
+    .card h3 { margin-top: 0; }
+
+    .stat-card {
+      background: #1e293b; border-radius: 12px; padding: 32px;
+      text-align: center; border: 1px solid #334155;
+    }
+    .stat-card .number { font-size: 48px; font-weight: 800; color: #38bdf8; }
+    .stat-card .label { font-size: 16px; color: #94a3b8; margin-top: 8px; }
+
+    .arch-box {
+      background: #1e293b; border: 1px solid #334155; border-radius: 8px;
+      padding: 24px; text-align: center; font-size: 18px; color: #e2e8f0;
+    }
+    .arch-arrow { text-align: center; font-size: 28px; color: #475569; padding: 12px 0; }
+
+    .tech-badge {
+      display: inline-block; background: #1e293b; border: 1px solid #334155;
+      border-radius: 8px; padding: 12px 20px; margin: 6px; font-size: 18px; color: #e2e8f0;
+    }
+
+    .divider { width: 80px; height: 4px; background: #38bdf8; border-radius: 2px; margin-bottom: 32px; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    th, td { text-align: left; padding: 14px 20px; font-size: 18px; border-bottom: 1px solid #334155; }
+    th { color: #94a3b8; font-weight: 600; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; }
+    td { color: #cbd5e1; }
+
+    .chart-container {
+      background: #1e293b; border-radius: 12px; padding: 24px; border: 1px solid #334155;
+    }
+    .chart-container h3 { margin-top: 0; margin-bottom: 12px; }
+    .chart-caption { font-size: 13px; color: #64748b; margin-top: 8px; }
+
+    /* Bar chart styles */
+    .bar-row { display: flex; align-items: center; margin: 6px 0; }
+    .bar-label { width: 140px; font-size: 14px; color: #94a3b8; text-align: right; padding-right: 12px; flex-shrink: 0; }
+    .bar-track { flex: 1; height: 28px; background: #0f172a; border-radius: 4px; position: relative; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; font-size: 13px; font-weight: 600; color: #fff; min-width: 40px; transition: width 0.3s; }
+    .bar-value { font-size: 14px; color: #cbd5e1; margin-left: 8px; flex-shrink: 0; }
+
+    /* Map mockup */
+    .map-mockup {
+      background: #1a2332; border-radius: 12px; border: 1px solid #334155;
+      padding: 16px; position: relative; overflow: hidden;
+    }
+
+    @media print {
+      .slide { page-break-after: always; min-height: auto; padding: 40px; }
+      body { background: white; color: #1e293b; }
+      h2 { color: #0f172a; }
+      .card, .stat-card, .arch-box, .chart-container { border-color: #e2e8f0; background: #f8fafc; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Slide 1: Title -->
+<div class="slide title">
+  <!-- Decorative map silhouette -->
+  <svg width="200" height="260" viewBox="0 0 200 260" style="margin: 0 auto 32px; opacity: 0.15;">
+    <path d="M95 10 L105 8 L115 15 L120 10 L130 20 L125 35 L135 45 L140 40 L145 50 L140 65 L148 75 L145 85 L150 95 L145 105 L150 115 L142 125 L148 135 L140 140 L135 155 L128 150 L120 160 L115 155 L110 165 L100 170 L105 180 L100 190 L108 195 L105 205 L95 200 L90 210 L80 215 L75 210 L70 220 L60 215 L55 225 L50 220 L45 230 L40 225 L42 215 L38 205 L45 195 L40 185 L50 175 L45 165 L55 155 L50 145 L55 135 L48 125 L55 115 L50 105 L55 95 L60 100 L65 90 L58 80 L65 70 L60 60 L68 50 L65 40 L72 35 L75 25 L80 30 L85 20 L90 25 Z" fill="#38bdf8"/>
+  </svg>
+  <h1>UK House Price Map</h1>
+  <div class="subtitle">Interactive choropleth map for property investors</div>
+  <p style="max-width:700px; margin:0 auto 48px; font-size:20px; color:#94a3b8;">
+    Visualising 24 million+ Land Registry transactions across 2,800 postcode districts in England &amp; Wales
+  </p>
+  <div class="meta">February 2026</div>
+  <div class="slide-number">1</div>
+</div>
+
+<!-- Slide 2: The Problem -->
+<div class="slide">
+  <div class="divider"></div>
+  <h2>The Problem</h2>
+  <p>
+    Property investors need to identify growth areas and compare price trends across the UK,
+    but existing tools are either <span class="highlight">behind paywalls</span>, show only
+    <span class="highlight">asking prices</span> (not actual sold prices), or lack
+    <span class="highlight">geographic granularity</span>.
+  </p>
+  <div class="grid-2" style="margin-top:40px;">
+    <div class="card">
+      <h3>Current Pain Points</h3>
+      <ul>
+        <li>Rightmove/Zoopla show asking prices, not real sale prices</li>
+        <li>No free interactive map of actual transaction data</li>
+        <li>Hard to spot emerging growth areas at a glance</li>
+        <li>Comparing districts requires manual lookup across multiple sites</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>What Investors Want</h3>
+      <ul>
+        <li>Real sold prices from official government records</li>
+        <li>Visual map to spot growth trends quickly</li>
+        <li>Year-over-year comparisons across districts</li>
+        <li>Breakdown by property type (houses vs flats)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-number">2</div>
+</div>
+
+<!-- Slide 3: Our Solution with map mockup -->
+<div class="slide">
+  <div class="divider"></div>
+  <h2>Our Solution</h2>
+  <p>
+    A free, open-source interactive map powered entirely by <span class="highlight">official government data</span>.
+  </p>
+  <div class="grid-2" style="margin-top:32px;">
+    <div>
+      <div class="grid-3" style="gap:16px;">
+        <div class="stat-card" style="padding:20px;">
+          <div class="number" style="font-size:36px;">24M+</div>
+          <div class="label">Transactions</div>
+        </div>
+        <div class="stat-card" style="padding:20px;">
+          <div class="number" style="font-size:36px;">2,800</div>
+          <div class="label">Districts</div>
+        </div>
+        <div class="stat-card" style="padding:20px;">
+          <div class="number" style="font-size:36px;">30 yrs</div>
+          <div class="label">History</div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:24px;">
+        <h3 style="margin-top:0;">How it works</h3>
+        <ul>
+          <li>Colour-coded map: blue = falling, red = rising</li>
+          <li>Click any district for detailed stats &amp; charts</li>
+          <li>Filter by property type &amp; year range</li>
+          <li>Compare districts side by side</li>
+        </ul>
+      </div>
+    </div>
+    <!-- Map mockup with choropleth regions -->
+    <div class="map-mockup" style="height:420px;">
+      <svg width="100%" height="100%" viewBox="0 0 400 400">
+        <!-- Background water -->
+        <rect width="400" height="400" fill="#1a2332"/>
+        <!-- Simplified England/Wales outline with coloured regions -->
+        <!-- Scotland -->
+        <path d="M180 20 L200 15 L220 25 L230 40 L225 60 L235 75 L225 90 L210 85 L195 95 L180 90 L170 75 L165 55 L175 40 Z" fill="#6366f1" opacity="0.7" stroke="#475569" stroke-width="1"/>
+        <!-- North East -->
+        <path d="M225 90 L240 95 L245 115 L235 125 L220 120 L210 110 L210 95 Z" fill="#a78bfa" opacity="0.7" stroke="#475569" stroke-width="1"/>
+        <!-- North West -->
+        <path d="M180 95 L210 95 L210 110 L220 120 L215 140 L195 145 L180 135 L170 115 Z" fill="#ef4444" opacity="0.7" stroke="#475569" stroke-width="1"/>
+        <!-- Yorkshire -->
+        <path d="M220 120 L245 115 L255 130 L250 150 L230 155 L215 145 L215 140 Z" fill="#f97316" opacity="0.7" stroke="#475569" stroke-width="1"/>
+        <!-- East Midlands -->
+        <path d="M230 155 L255 150 L265 170 L260 190 L240 195 L225 185 L220 170 Z" fill="#eab308" opacity="0.7" stroke="#475569" stroke-width="1"/>
+        <!-- West Midlands -->
+        <path d="M195 145 L220 145 L225 170 L225 190 L205 200 L185 190 L180 170 Z" fill="#f97316" opacity="0.7" stroke="#475569" stroke-width="1"/>
+        <!-- Wales -->
+        <path d="M145 140 L170 135 L180 155 L185 175 L185 195 L175 210 L160 215 L140 200 L135 180 L130 160 Z" fill="#3b82f6" opacity="0.7" stroke="#475569" stroke-width="1"/>
+        <!-- East of England -->
+        <path d="M260 190 L280 185 L290 200 L285 225 L270 235 L255 225 L250 210 Z" fill="#eab308" opacity="0.7" stroke="#475569" stroke-width="1"/>
+        <!-- London -->
+        <path d="M240 225 L265 220 L275 235 L270 250 L250 255 L235 245 Z" fill="#ef4444" opacity="0.8" stroke="#475569" stroke-width="1.5"/>
+        <!-- South East -->
+        <path d="M225 240 L240 225 L250 255 L270 250 L285 260 L280 280 L255 290 L230 280 L215 265 Z" fill="#f97316" opacity="0.7" stroke="#475569" stroke-width="1"/>
+        <!-- South West -->
+        <path d="M160 220 L185 210 L205 215 L220 235 L215 265 L200 280 L175 290 L150 275 L130 260 L120 240 L135 225 Z" fill="#22c55e" opacity="0.7" stroke="#475569" stroke-width="1"/>
+
+        <!-- Region labels -->
+        <text x="195" y="55" font-size="10" fill="#e2e8f0" text-anchor="middle" font-weight="600">Scotland</text>
+        <text x="190" y="120" font-size="9" fill="#e2e8f0" text-anchor="middle">NW</text>
+        <text x="235" y="140" font-size="9" fill="#e2e8f0" text-anchor="middle">Yorks</text>
+        <text x="200" y="180" font-size="9" fill="#e2e8f0" text-anchor="middle">W Mid</text>
+        <text x="245" y="175" font-size="9" fill="#e2e8f0" text-anchor="middle">E Mid</text>
+        <text x="150" y="180" font-size="9" fill="#e2e8f0" text-anchor="middle">Wales</text>
+        <text x="255" y="240" font-size="10" fill="#fff" text-anchor="middle" font-weight="700">London</text>
+        <text x="170" y="260" font-size="9" fill="#e2e8f0" text-anchor="middle">SW</text>
+        <text x="250" y="275" font-size="9" fill="#e2e8f0" text-anchor="middle">SE</text>
+
+        <!-- Legend -->
+        <rect x="15" y="330" width="16" height="12" rx="2" fill="#3b82f6"/>
+        <text x="36" y="340" font-size="10" fill="#94a3b8">Prices fell</text>
+        <rect x="105" y="330" width="16" height="12" rx="2" fill="#eab308"/>
+        <text x="126" y="340" font-size="10" fill="#94a3b8">Moderate</text>
+        <rect x="195" y="330" width="16" height="12" rx="2" fill="#ef4444"/>
+        <text x="216" y="340" font-size="10" fill="#94a3b8">Prices rose</text>
+
+        <!-- Sidebar mockup -->
+        <rect x="300" y="20" width="90" height="180" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+        <text x="310" y="40" font-size="9" fill="#38bdf8" font-weight="700">District: SW1</text>
+        <text x="310" y="58" font-size="8" fill="#94a3b8">Avg Price</text>
+        <text x="310" y="70" font-size="9" fill="#e2e8f0" font-weight="600">&pound;850K</text>
+        <text x="310" y="88" font-size="8" fill="#94a3b8">YoY Change</text>
+        <text x="310" y="100" font-size="9" fill="#22c55e" font-weight="600">+3.2%</text>
+        <text x="310" y="118" font-size="8" fill="#94a3b8">Days to Sell</text>
+        <text x="310" y="130" font-size="9" fill="#e2e8f0" font-weight="600">48 days</text>
+        <!-- Mini chart -->
+        <polyline points="310,165 320,160 330,155 340,150 350,152 360,145 370,140 380,135" fill="none" stroke="#38bdf8" stroke-width="1.5"/>
+        <text x="310" y="180" font-size="7" fill="#64748b">2018  2020  2022  2024</text>
+      </svg>
+    </div>
+  </div>
+  <div class="slide-number">3</div>
+</div>
+
+<!-- Slide 4: Key Features -->
+<div class="slide">
+  <div class="divider"></div>
+  <h2>Key Features</h2>
+  <div class="grid-2">
+    <div class="card">
+      <!-- Choropleth icon -->
+      <svg width="48" height="48" viewBox="0 0 48 48" style="margin-bottom:12px;">
+        <rect x="2" y="2" width="20" height="20" rx="3" fill="#ef4444" opacity="0.8"/>
+        <rect x="26" y="2" width="20" height="20" rx="3" fill="#3b82f6" opacity="0.8"/>
+        <rect x="2" y="26" width="20" height="20" rx="3" fill="#eab308" opacity="0.8"/>
+        <rect x="26" y="26" width="20" height="20" rx="3" fill="#22c55e" opacity="0.8"/>
+      </svg>
+      <h3 style="margin-top:0;">Choropleth Map</h3>
+      <p style="font-size:18px;">Colour-coded districts showing year-over-year price growth. Blue for falling, red for rising. Spot trends at a glance.</p>
+    </div>
+    <div class="card">
+      <!-- Stats icon -->
+      <svg width="48" height="48" viewBox="0 0 48 48" style="margin-bottom:12px;">
+        <rect x="4" y="8" width="40" height="32" rx="4" fill="none" stroke="#38bdf8" stroke-width="2"/>
+        <line x1="12" y1="18" x2="24" y2="18" stroke="#94a3b8" stroke-width="2"/>
+        <line x1="28" y1="18" x2="36" y2="18" stroke="#22c55e" stroke-width="2"/>
+        <line x1="12" y1="26" x2="20" y2="26" stroke="#94a3b8" stroke-width="2"/>
+        <line x1="24" y1="26" x2="36" y2="26" stroke="#38bdf8" stroke-width="2"/>
+        <line x1="12" y1="34" x2="30" y2="34" stroke="#94a3b8" stroke-width="2"/>
+      </svg>
+      <h3 style="margin-top:0;">District Details</h3>
+      <p style="font-size:18px;">Click any district to see average price, YoY change, transaction volume, and regional average days to sell.</p>
+    </div>
+    <div class="card">
+      <!-- Chart icon -->
+      <svg width="48" height="48" viewBox="0 0 48 48" style="margin-bottom:12px;">
+        <polyline points="6,38 14,30 22,32 30,20 38,14 44,10" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="6" y1="6" x2="6" y2="42" stroke="#475569" stroke-width="1.5"/>
+        <line x1="6" y1="42" x2="44" y2="42" stroke="#475569" stroke-width="1.5"/>
+      </svg>
+      <h3 style="margin-top:0;">Price Trend Charts</h3>
+      <p style="font-size:18px;">Historical price chart per district with adjustable year range. See how prices evolved over decades.</p>
+    </div>
+    <div class="card">
+      <!-- Building icon -->
+      <svg width="48" height="48" viewBox="0 0 48 48" style="margin-bottom:12px;">
+        <rect x="4" y="20" width="16" height="24" rx="2" fill="#38bdf8" opacity="0.3" stroke="#38bdf8" stroke-width="1.5"/>
+        <rect x="28" y="8" width="16" height="36" rx="2" fill="#38bdf8" opacity="0.3" stroke="#38bdf8" stroke-width="1.5"/>
+        <rect x="8" y="26" width="4" height="4" rx="1" fill="#38bdf8"/>
+        <rect x="8" y="34" width="4" height="4" rx="1" fill="#38bdf8"/>
+        <rect x="32" y="14" width="4" height="4" rx="1" fill="#38bdf8"/>
+        <rect x="32" y="22" width="4" height="4" rx="1" fill="#38bdf8"/>
+        <rect x="32" y="30" width="4" height="4" rx="1" fill="#38bdf8"/>
+        <rect x="38" y="14" width="4" height="4" rx="1" fill="#38bdf8"/>
+        <rect x="38" y="22" width="4" height="4" rx="1" fill="#38bdf8"/>
+      </svg>
+      <h3 style="margin-top:0;">Property Type Breakdown</h3>
+      <p style="font-size:18px;">Filter by Detached, Semi-detached, Terraced, or Flats. Compare average prices by building type.</p>
+    </div>
+    <div class="card">
+      <!-- Search icon -->
+      <svg width="48" height="48" viewBox="0 0 48 48" style="margin-bottom:12px;">
+        <circle cx="20" cy="20" r="14" fill="none" stroke="#38bdf8" stroke-width="2.5"/>
+        <line x1="30" y1="30" x2="42" y2="42" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <h3 style="margin-top:0;">Search &amp; Navigate</h3>
+      <p style="font-size:18px;">Search by postcode or area name. The map flies to the selected district with a smooth animation.</p>
+    </div>
+    <div class="card">
+      <!-- Compare icon -->
+      <svg width="48" height="48" viewBox="0 0 48 48" style="margin-bottom:12px;">
+        <rect x="2" y="8" width="18" height="32" rx="3" fill="none" stroke="#38bdf8" stroke-width="2"/>
+        <rect x="28" y="8" width="18" height="32" rx="3" fill="none" stroke="#a78bfa" stroke-width="2"/>
+        <line x1="24" y1="14" x2="24" y2="34" stroke="#475569" stroke-width="1" stroke-dasharray="3 3"/>
+        <text x="11" y="28" font-size="8" fill="#38bdf8" text-anchor="middle" font-weight="700">A</text>
+        <text x="37" y="28" font-size="8" fill="#a78bfa" text-anchor="middle" font-weight="700">B</text>
+      </svg>
+      <h3 style="margin-top:0;">Compare Districts</h3>
+      <p style="font-size:18px;">Side-by-side comparison of two districts. Evaluate investment targets against each other.</p>
+    </div>
+  </div>
+  <div class="slide-number">4</div>
+</div>
+
+<!-- Slide 5: Price Trend Chart -->
+<div class="slide">
+  <div class="divider"></div>
+  <h2>UK House Price Growth (1995 &ndash; 2025)</h2>
+  <p>Average house price trend based on HM Land Registry data.</p>
+  <div class="chart-container" style="margin-top:24px;">
+    <svg width="100%" height="340" viewBox="0 0 900 340">
+      <!-- Grid -->
+      <line x1="80" y1="20" x2="80" y2="280" stroke="#334155" stroke-width="1"/>
+      <line x1="80" y1="280" x2="870" y2="280" stroke="#334155" stroke-width="1"/>
+      <!-- Horizontal grid lines -->
+      <line x1="80" y1="60" x2="870" y2="60" stroke="#1e293b" stroke-width="1" stroke-dasharray="4 4"/>
+      <line x1="80" y1="120" x2="870" y2="120" stroke="#1e293b" stroke-width="1" stroke-dasharray="4 4"/>
+      <line x1="80" y1="180" x2="870" y2="180" stroke="#1e293b" stroke-width="1" stroke-dasharray="4 4"/>
+      <line x1="80" y1="240" x2="870" y2="240" stroke="#1e293b" stroke-width="1" stroke-dasharray="4 4"/>
+      <!-- Y-axis labels -->
+      <text x="72" y="285" font-size="12" fill="#64748b" text-anchor="end">0</text>
+      <text x="72" y="245" font-size="12" fill="#64748b" text-anchor="end">&pound;75K</text>
+      <text x="72" y="185" font-size="12" fill="#64748b" text-anchor="end">&pound;150K</text>
+      <text x="72" y="125" font-size="12" fill="#64748b" text-anchor="end">&pound;225K</text>
+      <text x="72" y="65" font-size="12" fill="#64748b" text-anchor="end">&pound;300K</text>
+      <!-- X-axis labels -->
+      <text x="80" y="300" font-size="12" fill="#64748b" text-anchor="middle">1995</text>
+      <text x="212" y="300" font-size="12" fill="#64748b" text-anchor="middle">2000</text>
+      <text x="344" y="300" font-size="12" fill="#64748b" text-anchor="middle">2005</text>
+      <text x="476" y="300" font-size="12" fill="#64748b" text-anchor="middle">2010</text>
+      <text x="608" y="300" font-size="12" fill="#64748b" text-anchor="middle">2015</text>
+      <text x="740" y="300" font-size="12" fill="#64748b" text-anchor="middle">2020</text>
+      <text x="870" y="300" font-size="12" fill="#64748b" text-anchor="middle">2025</text>
+      <!-- Area fill -->
+      <path d="M80,255 L132,250 L185,242 L238,225 L290,200 L344,175 L396,170 L449,165 L502,172 L555,160 L608,150 L660,145 L713,140 L740,155 L766,142 L820,130 L870,125 L870,280 L80,280 Z"
+            fill="url(#areaGrad)" opacity="0.3"/>
+      <!-- Line -->
+      <polyline points="80,255 132,250 185,242 238,225 290,200 344,175 396,170 449,165 502,172 555,160 608,150 660,145 713,140 740,155 766,142 820,130 870,125"
+                fill="none" stroke="#38bdf8" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+      <!-- Key data points -->
+      <circle cx="80" cy="255" r="4" fill="#38bdf8"/>
+      <circle cx="344" cy="175" r="4" fill="#38bdf8"/>
+      <circle cx="502" cy="172" r="4" fill="#38bdf8"/>
+      <circle cx="740" cy="155" r="4" fill="#38bdf8"/>
+      <circle cx="870" cy="125" r="4" fill="#38bdf8"/>
+      <!-- Annotations -->
+      <text x="85" y="248" font-size="11" fill="#94a3b8">&pound;62K</text>
+      <text x="349" y="168" font-size="11" fill="#94a3b8">&pound;190K</text>
+      <text x="507" y="165" font-size="11" fill="#94a3b8">&pound;168K</text>
+      <text x="502" y="188" font-size="10" fill="#ef4444">2008 crash</text>
+      <text x="875" y="120" font-size="11" fill="#22c55e" font-weight="600">&pound;270K</text>
+      <!-- Gradient definition -->
+      <defs>
+        <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.4"/>
+          <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <div class="chart-caption">Source: HM Land Registry Price Paid Data. UK national average.</div>
+  </div>
+  <div class="slide-number">5</div>
+</div>
+
+<!-- Slide 6: Regional Days to Sell -->
+<div class="slide">
+  <div class="divider"></div>
+  <h2>Average Days to Sell by Region</h2>
+  <p>How long properties take to sell varies dramatically across the UK.</p>
+  <div class="grid-2" style="margin-top:24px;">
+    <div class="chart-container">
+      <h3 style="margin-top:0;">Days from listing to sale</h3>
+      <div style="margin-top:16px;">
+        <div class="bar-row"><div class="bar-label">Scotland</div><div class="bar-track"><div class="bar-fill" style="width:37%; background:#22c55e;">21</div></div></div>
+        <div class="bar-row"><div class="bar-label">North West</div><div class="bar-track"><div class="bar-fill" style="width:58%; background:#38bdf8;">33</div></div></div>
+        <div class="bar-row"><div class="bar-label">North East</div><div class="bar-track"><div class="bar-fill" style="width:61%; background:#38bdf8;">35</div></div></div>
+        <div class="bar-row"><div class="bar-label">Yorkshire</div><div class="bar-track"><div class="bar-fill" style="width:65%; background:#38bdf8;">37</div></div></div>
+        <div class="bar-row"><div class="bar-label">East Midlands</div><div class="bar-track"><div class="bar-fill" style="width:70%; background:#eab308;">40</div></div></div>
+        <div class="bar-row"><div class="bar-label">West Midlands</div><div class="bar-track"><div class="bar-fill" style="width:74%; background:#eab308;">42</div></div></div>
+        <div class="bar-row"><div class="bar-label">East of England</div><div class="bar-track"><div class="bar-fill" style="width:79%; background:#f97316;">45</div></div></div>
+        <div class="bar-row"><div class="bar-label">South West</div><div class="bar-track"><div class="bar-fill" style="width:81%; background:#f97316;">46</div></div></div>
+        <div class="bar-row"><div class="bar-label">London</div><div class="bar-track"><div class="bar-fill" style="width:84%; background:#f97316;">48</div></div></div>
+        <div class="bar-row"><div class="bar-label">South East</div><div class="bar-track"><div class="bar-fill" style="width:88%; background:#ef4444;">50</div></div></div>
+        <div class="bar-row"><div class="bar-label">Wales</div><div class="bar-track"><div class="bar-fill" style="width:100%; background:#ef4444;">57</div></div></div>
+      </div>
+      <div class="chart-caption">Source: Zoopla House Price Index, January 2026</div>
+    </div>
+    <div>
+      <div class="card">
+        <h3 style="margin-top:0;">Key Insights</h3>
+        <ul>
+          <li><span class="highlight">2.7x gap</span> between fastest (Scotland, 21 days) and slowest (Wales, 57 days)</li>
+          <li>Northern regions sell faster, reflecting stronger buyer demand vs supply</li>
+          <li>London is not the slowest despite highest prices</li>
+          <li>Affordable markets (NW, NE) attract quicker decisions</li>
+        </ul>
+      </div>
+      <div class="card" style="margin-top:24px;">
+        <h3 style="margin-top:0;">In Our App</h3>
+        <p style="font-size:18px;">Each district sidebar shows the regional average days to sell, with the region name displayed so investors understand the granularity.</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">6</div>
+</div>
+
+<!-- Slide 7: Property Type Breakdown -->
+<div class="slide">
+  <div class="divider"></div>
+  <h2>Average Price by Property Type</h2>
+  <p>Prices vary significantly by building type. Our app breaks down each district.</p>
+  <div class="grid-2" style="margin-top:24px;">
+    <div class="chart-container">
+      <h3 style="margin-top:0;">UK Average Prices (2025)</h3>
+      <svg width="100%" height="280" viewBox="0 0 420 280">
+        <!-- Bars -->
+        <rect x="30" y="30" width="70" height="200" rx="6" fill="#38bdf8" opacity="0.85"/>
+        <rect x="115" y="80" width="70" height="150" rx="6" fill="#a78bfa" opacity="0.85"/>
+        <rect x="200" y="110" width="70" height="120" rx="6" fill="#22c55e" opacity="0.85"/>
+        <rect x="285" y="140" width="70" height="90" rx="6" fill="#f97316" opacity="0.85"/>
+        <!-- Values -->
+        <text x="65" y="22" font-size="14" fill="#38bdf8" text-anchor="middle" font-weight="700">&pound;450K</text>
+        <text x="150" y="72" font-size="14" fill="#a78bfa" text-anchor="middle" font-weight="700">&pound;310K</text>
+        <text x="235" y="102" font-size="14" fill="#22c55e" text-anchor="middle" font-weight="700">&pound;245K</text>
+        <text x="320" y="132" font-size="14" fill="#f97316" text-anchor="middle" font-weight="700">&pound;210K</text>
+        <!-- Labels -->
+        <text x="65" y="250" font-size="13" fill="#cbd5e1" text-anchor="middle">Detached</text>
+        <text x="150" y="250" font-size="13" fill="#cbd5e1" text-anchor="middle">Semi</text>
+        <text x="235" y="250" font-size="13" fill="#cbd5e1" text-anchor="middle">Terraced</text>
+        <text x="320" y="250" font-size="13" fill="#cbd5e1" text-anchor="middle">Flat</text>
+        <!-- Baseline -->
+        <line x1="20" y1="230" x2="370" y2="230" stroke="#334155" stroke-width="1"/>
+      </svg>
+      <div class="chart-caption">Approximate UK averages from Land Registry data</div>
+    </div>
+    <!-- Donut chart: transaction share -->
+    <div class="chart-container">
+      <h3 style="margin-top:0;">Share of Transactions</h3>
+      <svg width="100%" height="280" viewBox="0 0 420 280">
+        <!-- Donut chart -->
+        <g transform="translate(140,140)">
+          <!-- Terraced: 32% = 115.2 degrees, start 0 -->
+          <path d="M0,-100 A100,100 0 0,1 86.6,50 L52,30 A60,60 0 0,0 0,-60 Z" fill="#22c55e" opacity="0.85"/>
+          <!-- Semi: 26% = 93.6 degrees -->
+          <path d="M86.6,50 A100,100 0 0,1 -50,86.6 L-30,52 A60,60 0 0,0 52,30 Z" fill="#a78bfa" opacity="0.85"/>
+          <!-- Flat: 24% = 86.4 degrees -->
+          <path d="M-50,86.6 A100,100 0 0,1 -97,-26 L-58,-16 A60,60 0 0,0 -30,52 Z" fill="#f97316" opacity="0.85"/>
+          <!-- Detached: 18% = 64.8 degrees -->
+          <path d="M-97,-26 A100,100 0 0,1 0,-100 L0,-60 A60,60 0 0,0 -58,-16 Z" fill="#38bdf8" opacity="0.85"/>
+          <!-- Center -->
+          <circle cx="0" cy="0" r="45" fill="#1e293b"/>
+          <text x="0" y="5" font-size="14" fill="#94a3b8" text-anchor="middle">Total</text>
+        </g>
+        <!-- Legend -->
+        <rect x="290" y="60" width="14" height="14" rx="3" fill="#22c55e" opacity="0.85"/>
+        <text x="310" y="72" font-size="13" fill="#cbd5e1">Terraced 32%</text>
+        <rect x="290" y="90" width="14" height="14" rx="3" fill="#a78bfa" opacity="0.85"/>
+        <text x="310" y="102" font-size="13" fill="#cbd5e1">Semi 26%</text>
+        <rect x="290" y="120" width="14" height="14" rx="3" fill="#f97316" opacity="0.85"/>
+        <text x="310" y="132" font-size="13" fill="#cbd5e1">Flat 24%</text>
+        <rect x="290" y="150" width="14" height="14" rx="3" fill="#38bdf8" opacity="0.85"/>
+        <text x="310" y="162" font-size="13" fill="#cbd5e1">Detached 18%</text>
+      </svg>
+      <div class="chart-caption">Approximate distribution from Land Registry data</div>
+    </div>
+  </div>
+  <div class="slide-number">7</div>
+</div>
+
+<!-- Slide 8: Data Sources -->
+<div class="slide">
+  <div class="divider"></div>
+  <h2>Data Sources</h2>
+  <p>All data is <span class="highlight">free, legal, and open</span> under government licences.</p>
+  <table>
+    <thead>
+      <tr><th>Source</th><th>What It Provides</th><th>Coverage</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="highlight">HM Land Registry</span></td>
+        <td>Actual sold prices, dates, property types, postcodes</td>
+        <td>England &amp; Wales, 1995&ndash;present</td>
+      </tr>
+      <tr>
+        <td><span class="highlight">Zoopla HPI</span></td>
+        <td>Regional average days to sell</td>
+        <td>11 UK regions, monthly</td>
+      </tr>
+      <tr>
+        <td><span class="highlight">OpenStreetMap</span></td>
+        <td>Map tiles for the interactive base map</td>
+        <td>Global, real-time</td>
+      </tr>
+      <tr>
+        <td><span class="highlight">postcodes.io</span></td>
+        <td>Postcode geocoding (lat/lng coordinates)</td>
+        <td>All UK postcodes</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="slide-number">8</div>
+</div>
+
+<!-- Slide 9: Architecture -->
+<div class="slide">
+  <div class="divider"></div>
+  <h2>Architecture</h2>
+  <p>No backend server required. A static site that can be hosted anywhere.</p>
+  <div class="grid-2" style="margin-top:32px;">
+    <div style="max-width:500px;">
+      <div class="arch-box">
+        <strong>Land Registry CSV</strong><br>
+        <span style="font-size:14px; color:#94a3b8;">4.3 GB &bull; 24M+ rows &bull; Downloaded once</span>
+      </div>
+      <div class="arch-arrow">&darr;</div>
+      <div class="arch-box">
+        <strong>Node.js Processing Pipeline</strong><br>
+        <span style="font-size:14px; color:#94a3b8;">Stream CSV &rarr; Group by district &rarr; Calculate stats</span>
+      </div>
+      <div class="arch-arrow">&darr;</div>
+      <div class="arch-box">
+        <strong>Static Files</strong><br>
+        <span style="font-size:14px; color:#94a3b8;">districts-summary.geojson + per-district trend JSONs</span>
+      </div>
+      <div class="arch-arrow">&darr;</div>
+      <div class="arch-box">
+        <strong>React SPA</strong><br>
+        <span style="font-size:14px; color:#94a3b8;">Fetch on demand &rarr; Leaflet choropleth &rarr; Interactive UI</span>
+      </div>
+    </div>
+    <div>
+      <h3>Tech Stack</h3>
+      <div style="margin-top:8px;">
+        <span class="tech-badge">React 19</span>
+        <span class="tech-badge">TypeScript 5.9</span>
+        <span class="tech-badge">Vite 7</span>
+        <span class="tech-badge">Tailwind CSS 4</span>
+        <span class="tech-badge">Leaflet</span>
+        <span class="tech-badge">React-Leaflet</span>
+        <span class="tech-badge">Recharts</span>
+        <span class="tech-badge">Node.js</span>
+        <span class="tech-badge">csv-parser</span>
+      </div>
+      <p style="margin-top:24px; font-size:18px; color:#94a3b8;">
+        All dependencies are free and open-source. Zero hosting cost on static platforms like GitHub Pages or Vercel.
+      </p>
+    </div>
+  </div>
+  <div class="slide-number">9</div>
+</div>
+
+<!-- Slide 10: Market Context -->
+<div class="slide">
+  <div class="divider"></div>
+  <h2>UK Housing Market Context</h2>
+  <p style="margin-bottom:32px;">Data as of January 2026 from official sources.</p>
+  <div class="grid-3">
+    <div class="stat-card">
+      <div class="number">&pound;269,800</div>
+      <div class="label">UK average house price</div>
+    </div>
+    <div class="stat-card">
+      <div class="number" style="color:#22c55e;">+1.2%</div>
+      <div class="label">Annual price change</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">~40 days</div>
+      <div class="label">UK average time to sell</div>
+    </div>
+  </div>
+  <div class="grid-2" style="margin-top:32px;">
+    <div class="card">
+      <h3 style="margin-top:0;">Regional Variation</h3>
+      <ul>
+        <li><span class="highlight">Scotland:</span> fastest to sell (21 days avg)</li>
+        <li><span class="highlight">North West:</span> strongest growth, 6 of top 10 postcodes</li>
+        <li><span class="highlight">Wales:</span> slowest to sell (57 days avg)</li>
+        <li><span class="highlight">London:</span> highest prices but moderate growth</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">Why This Tool Matters</h3>
+      <ul>
+        <li>Regional performance varies dramatically</li>
+        <li>Affordable areas are outperforming expensive ones</li>
+        <li>Investors need granular, postcode-level visibility</li>
+        <li>Our map makes these patterns visible instantly</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-number">10</div>
+</div>
+
+<!-- Slide 11: User Journey -->
+<div class="slide">
+  <div class="divider"></div>
+  <h2>User Journey</h2>
+  <div style="margin-top:20px;">
+    <div class="grid-2">
+      <div class="card" style="text-align:center;">
+        <svg width="64" height="64" viewBox="0 0 64 64" style="margin:0 auto 16px;">
+          <circle cx="32" cy="32" r="28" fill="none" stroke="#38bdf8" stroke-width="2"/>
+          <text x="32" y="38" font-size="24" fill="#38bdf8" text-anchor="middle" font-weight="700">1</text>
+        </svg>
+        <h3 style="margin-top:0;">Explore the Map</h3>
+        <p style="font-size:18px; text-align:left;">Open the app to see a colour-coded map. Blue = falling prices, red = rising. Pan and zoom to explore.</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <svg width="64" height="64" viewBox="0 0 64 64" style="margin:0 auto 16px;">
+          <circle cx="32" cy="32" r="28" fill="none" stroke="#38bdf8" stroke-width="2"/>
+          <text x="32" y="38" font-size="24" fill="#38bdf8" text-anchor="middle" font-weight="700">2</text>
+        </svg>
+        <h3 style="margin-top:0;">Click a District</h3>
+        <p style="font-size:18px; text-align:left;">Click any district to open the sidebar with avg price, YoY change, transactions, and days to sell.</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <svg width="64" height="64" viewBox="0 0 64 64" style="margin:0 auto 16px;">
+          <circle cx="32" cy="32" r="28" fill="none" stroke="#38bdf8" stroke-width="2"/>
+          <text x="32" y="38" font-size="24" fill="#38bdf8" text-anchor="middle" font-weight="700">3</text>
+        </svg>
+        <h3 style="margin-top:0;">Analyse Trends</h3>
+        <p style="font-size:18px; text-align:left;">View the historical price chart. Adjust the year range. See property type breakdown.</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <svg width="64" height="64" viewBox="0 0 64 64" style="margin:0 auto 16px;">
+          <circle cx="32" cy="32" r="28" fill="none" stroke="#38bdf8" stroke-width="2"/>
+          <text x="32" y="38" font-size="24" fill="#38bdf8" text-anchor="middle" font-weight="700">4</text>
+        </svg>
+        <h3 style="margin-top:0;">Filter &amp; Compare</h3>
+        <p style="font-size:18px; text-align:left;">Filter by property type. Compare two districts side by side. Search for specific postcodes.</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">11</div>
+</div>
+
+<!-- Slide 12: Future Roadmap -->
+<div class="slide">
+  <div class="divider"></div>
+  <h2>Future Roadmap</h2>
+  <div class="grid-2" style="margin-top:20px;">
+    <div class="card">
+      <h3 style="margin-top:0;">Short Term</h3>
+      <ul>
+        <li>EPC data integration (floor area, energy ratings)</li>
+        <li>Price-per-square-metre calculations</li>
+        <li>Links to Rightmove/Zoopla for current listings</li>
+        <li>Mobile-responsive layout</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">Long Term</h3>
+      <ul>
+        <li>Rental yield estimates</li>
+        <li>Transport links and amenity scoring</li>
+        <li>Investment hotspot prediction model</li>
+        <li>Scotland coverage (Registers of Scotland)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-number">12</div>
+</div>
+
+<!-- Slide 13: Thank You -->
+<div class="slide title">
+  <svg width="120" height="120" viewBox="0 0 120 120" style="margin: 0 auto 24px;">
+    <circle cx="60" cy="60" r="56" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.3"/>
+    <circle cx="60" cy="60" r="42" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.5"/>
+    <circle cx="60" cy="60" r="28" fill="#38bdf8" opacity="0.15"/>
+    <polyline points="38,72 50,60 58,68 72,48 82,52" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <h1>Thank You</h1>
+  <div class="subtitle" style="margin-bottom:48px;">UK House Price Map</div>
+  <div class="grid-3" style="max-width:900px; margin:0 auto;">
+    <div class="stat-card">
+      <div class="number" style="font-size:32px;">Free &amp; Open</div>
+      <div class="label">Government data, no paywalls</div>
+    </div>
+    <div class="stat-card">
+      <div class="number" style="font-size:32px;">No Backend</div>
+      <div class="label">Static site, zero hosting cost</div>
+    </div>
+    <div class="stat-card">
+      <div class="number" style="font-size:32px;">24M+ Sales</div>
+      <div class="label">30 years of real transactions</div>
+    </div>
+  </div>
+  <div class="meta" style="margin-top:48px;">
+    <a href="https://github.com/vsohr/openmap-house-prices" style="color:#38bdf8; text-decoration:none;">
+      github.com/vsohr/openmap-house-prices
+    </a>
+  </div>
+  <div class="slide-number">13</div>
+</div>
+
+</body>
+</html>

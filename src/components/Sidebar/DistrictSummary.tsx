@@ -1,5 +1,7 @@
 import type { DistrictTrend } from '../../types';
 import { formatCurrency, formatPercent, formatNumber } from '../../utils/formatters';
+import { useRegionalDaysToSell } from '../../hooks/useRegionalDaysToSell';
+import { getDaysToSellForDistrict, getRegionForDistrict } from '../../utils/postcodeRegions';
 
 interface DistrictSummaryProps {
   trend: DistrictTrend;
@@ -7,6 +9,7 @@ interface DistrictSummaryProps {
 
 export function DistrictSummary({ trend }: DistrictSummaryProps) {
   const latest = trend.years[trend.years.length - 1];
+  const { data: regionalData } = useRegionalDaysToSell();
   if (!latest) return null;
 
   const prevYear = trend.years.length >= 2
@@ -28,11 +31,6 @@ export function DistrictSummary({ trend }: DistrictSummaryProps) {
           {formatCurrency(latest.avgPrice)}
         </dd>
 
-        <dt className="text-gray-500">Median Price</dt>
-        <dd className="font-semibold text-gray-900">
-          {formatCurrency(latest.medianPrice)}
-        </dd>
-
         <dt className="text-gray-500">YoY Change</dt>
         <dd
           className={`font-semibold ${
@@ -49,6 +47,22 @@ export function DistrictSummary({ trend }: DistrictSummaryProps) {
 
         <dt className="text-gray-500">Data Year</dt>
         <dd className="font-semibold text-gray-900">{latest.year}</dd>
+
+        <dt className="text-gray-500" title="Regional average from Zoopla HPI">
+          Avg Days to Sell
+        </dt>
+        <dd className="font-semibold text-gray-900">
+          {getDaysToSellForDistrict(trend.code, regionalData) !== null ? (
+            <span>
+              {getDaysToSellForDistrict(trend.code, regionalData)} days
+              <span className="ml-1 text-xs font-normal text-gray-400">
+                ({getRegionForDistrict(trend.code)})
+              </span>
+            </span>
+          ) : (
+            'N/A'
+          )}
+        </dd>
       </dl>
     </div>
   );

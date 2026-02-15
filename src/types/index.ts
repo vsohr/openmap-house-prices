@@ -12,7 +12,6 @@ export interface DistrictProperties {
   code: string;           // e.g. "SW1", "B1"
   name: string;           // District name
   avgPrice: number;       // Latest average price
-  medianPrice: number;    // Latest median price
   transactionCount: number;
   yoyChange: number;      // Year-over-year % change
   byType: Record<PropertyType, TypeStats>;
@@ -33,7 +32,6 @@ export interface DistrictCollection {
 export interface YearlyStats {
   year: number;
   avgPrice: number;
-  medianPrice: number;
   transactionCount: number;
   yoyChange: number | null;
   byType: Record<PropertyType, TypeStats>;

@@ -43,7 +43,6 @@ const features = SAMPLE_DISTRICTS.map((d) => ({
     code: d.code,
     name: d.code,
     avgPrice: d.basePrice,
-    medianPrice: Math.round(d.basePrice * 0.92),
     transactionCount: Math.floor(Math.random() * 500) + 100,
     yoyChange: d.growth,
     latestYear: 2025,
@@ -72,7 +71,6 @@ for (const d of SAMPLE_DISTRICTS) {
     years.push({
       year,
       avgPrice,
-      medianPrice: Math.round(avgPrice * 0.92),
       transactionCount: Math.floor(Math.random() * 500) + 50,
       yoyChange: year === 2000 ? null : parseFloat((d.growth + (Math.random() * 4 - 2)).toFixed(1)),
       byType: {

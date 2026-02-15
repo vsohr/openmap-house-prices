@@ -62,14 +62,6 @@ function getPostcodeDistrict(postcode: string): string {
   return match ? match[1].toUpperCase() : trimmed.toUpperCase();
 }
 
-function median(sorted: number[]): number {
-  if (sorted.length === 0) return 0;
-  const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 !== 0
-    ? sorted[mid]
-    : (sorted[mid - 1] + sorted[mid]) / 2;
-}
-
 // --- Step 1: Stream and aggregate CSV ---
 
 async function aggregateCSV(): Promise<AggregatedData> {
@@ -141,7 +133,6 @@ async function aggregateCSV(): Promise<AggregatedData> {
 interface ComputedYearStats {
   year: number;
   avgPrice: number;
-  medianPrice: number;
   transactionCount: number;
   yoyChange: number | null;
   byType: Record<string, { avgPrice: number; count: number }>;
@@ -164,7 +155,6 @@ function computeStats(data: AggregatedData): Map<string, ComputedDistrict> {
       const acc = yearMap.get(year)!;
       const sorted = acc.prices.slice().sort((a, b) => a - b);
       const avg = Math.round(sorted.reduce((s, v) => s + v, 0) / sorted.length);
-      const med = Math.round(median(sorted));
 
       const byType: Record<string, { avgPrice: number; count: number }> = {};
       for (const [pType, prices] of Object.entries(acc.byType)) {
@@ -184,7 +174,6 @@ function computeStats(data: AggregatedData): Map<string, ComputedDistrict> {
       yearStats.push({
         year,
         avgPrice: avg,
-        medianPrice: med,
         transactionCount: sorted.length,
         yoyChange,
         byType,
@@ -287,7 +276,6 @@ function writeOutputs(
         code,
         name: code,
         avgPrice: latest.avgPrice,
-        medianPrice: latest.medianPrice,
         transactionCount: latest.transactionCount,
         yoyChange,
         latestYear: latest.year,

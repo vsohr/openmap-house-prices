@@ -90,6 +90,31 @@ for (const d of SAMPLE_DISTRICTS) {
   );
 }
 
+// Write regional days-to-sell data
+const regionalDaysToSell = {
+  ukAverage: 40,
+  lastUpdated: "2026-01",
+  regions: [
+    { region: "North East", avgDaysToSell: 35, dataMonth: "2026-01", source: "Zoopla HPI" },
+    { region: "North West", avgDaysToSell: 33, dataMonth: "2026-01", source: "Zoopla HPI" },
+    { region: "Yorkshire & The Humber", avgDaysToSell: 37, dataMonth: "2026-01", source: "Zoopla HPI" },
+    { region: "East Midlands", avgDaysToSell: 40, dataMonth: "2026-01", source: "Zoopla HPI" },
+    { region: "West Midlands", avgDaysToSell: 42, dataMonth: "2026-01", source: "Zoopla HPI" },
+    { region: "East of England", avgDaysToSell: 45, dataMonth: "2026-01", source: "Zoopla HPI" },
+    { region: "London", avgDaysToSell: 48, dataMonth: "2026-01", source: "Zoopla HPI" },
+    { region: "South East", avgDaysToSell: 50, dataMonth: "2026-01", source: "Zoopla HPI" },
+    { region: "South West", avgDaysToSell: 46, dataMonth: "2026-01", source: "Zoopla HPI" },
+    { region: "Wales", avgDaysToSell: 57, dataMonth: "2026-01", source: "Zoopla HPI" },
+    { region: "Scotland", avgDaysToSell: 21, dataMonth: "2026-01", source: "Zoopla HPI" },
+  ],
+};
+
+fs.writeFileSync(
+  path.join(OUTPUT_DIR, "regional-days-to-sell.json"),
+  JSON.stringify(regionalDaysToSell, null, 2)
+);
+
 console.log(`Sample data written to ${OUTPUT_DIR}`);
 console.log(`  districts-summary.geojson: ${features.length} features`);
 console.log(`  trends/: ${SAMPLE_DISTRICTS.length} files`);
+console.log(`  regional-days-to-sell.json: ${regionalDaysToSell.regions.length} regions`);

@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UK House Price Map - Project Presentation</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #0f172a; color: #e2e8f0; }
+
+    .slide {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 120px;
+      border-bottom: 1px solid #1e293b;
+      position: relative;
+    }
+
+    .slide-number {
+      position: absolute;
+      bottom: 30px;
+      right: 60px;
+      font-size: 14px;
+      color: #475569;
+    }
+
+    /* Title slide */
+    .slide.title { text-align: center; padding: 60px; }
+    .slide.title h1 { font-size: 64px; font-weight: 800; color: #f8fafc; margin-bottom: 16px; line-height: 1.1; }
+    .slide.title .subtitle { font-size: 28px; color: #94a3b8; margin-bottom: 48px; }
+    .slide.title .meta { font-size: 18px; color: #64748b; }
+
+    /* Content slides */
+    h2 { font-size: 42px; font-weight: 700; color: #f8fafc; margin-bottom: 40px; }
+    h3 { font-size: 24px; font-weight: 600; color: #38bdf8; margin-bottom: 16px; margin-top: 32px; }
+
+    p { font-size: 22px; line-height: 1.6; color: #cbd5e1; margin-bottom: 16px; max-width: 900px; }
+
+    ul { list-style: none; padding: 0; }
+    ul li {
+      font-size: 22px;
+      line-height: 1.6;
+      color: #cbd5e1;
+      padding: 8px 0;
+      padding-left: 32px;
+      position: relative;
+    }
+    ul li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 18px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #38bdf8;
+    }
+
+    .highlight { color: #38bdf8; font-weight: 600; }
+    .stat { color: #22d3ee; font-weight: 700; font-size: 26px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
+
+    .card {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 32px;
+      border: 1px solid #334155;
+    }
+    .card h3 { margin-top: 0; }
+
+    .stat-card {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 32px;
+      text-align: center;
+      border: 1px solid #334155;
+    }
+    .stat-card .number { font-size: 48px; font-weight: 800; color: #38bdf8; }
+    .stat-card .label { font-size: 16px; color: #94a3b8; margin-top: 8px; }
+
+    .arch-box {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 24px;
+      text-align: center;
+      font-size: 18px;
+      color: #e2e8f0;
+    }
+    .arch-arrow {
+      text-align: center;
+      font-size: 28px;
+      color: #475569;
+      padding: 12px 0;
+    }
+
+    .tech-badge {
+      display: inline-block;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 12px 20px;
+      margin: 6px;
+      font-size: 18px;
+      color: #e2e8f0;
+    }
+
+    .divider { width: 80px; height: 4px; background: #38bdf8; border-radius: 2px; margin-bottom: 32px; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    th, td { text-align: left; padding: 14px 20px; font-size: 18px; border-bottom: 1px solid #334155; }
+    th { color: #94a3b8; font-weight: 600; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; }
+    td { color: #cbd5e1; }
+
+    @media print {
+      .slide { page-break-after: always; min-height: auto; padding: 40px; }
+      body { background: white; color: #1e293b; }
+      h2 { color: #0f172a; }
+      .card, .stat-card, .arch-box { border-color: #e2e8f0; background: #f8fafc; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Slide 1: Title -->
+<div class="slide title">
+  <h1>UK House Price Map</h1>
+  <div class="subtitle">Interactive choropleth map for property investors</div>
+  <p style="max-width:700px; margin:0 auto 48px; font-size:20px; color:#94a3b8;">
+    Visualising 24 million+ Land Registry transactions across 2,800 postcode districts in England &amp; Wales
+  </p>
+  <div class="meta">February 2026</div>
+  <div class="slide-number">1</div>
+</div>
+
+<!-- Slide 2: The Problem -->
+<div class="slide">
+  <div class="divider"></div>
+  <h2>The Problem</h2>
+  <p>
+    Property investors need to identify growth areas and compare price trends across the UK,
+    but existing tools are either <span class="highlight">behind paywalls</span>, show only
+    <span class="highlight">asking prices</span> (not actual sold prices), or lack
+    <span class="highlight">geographic granularity</span>.
+  </p>
+  <div class="grid-2" style="margin-top:40px;">
+    <div class="card">
+      <h3>Current Pain Points</h3>
+      <ul>
+        <li>Rightmove/Zoopla show asking prices, not real sale prices</li>
+        <li>No free interactive map of actual transaction data</li>
+        <li>Hard to spot emerging growth areas at a glance</li>
+        <li>Comparing districts requires manual lookup across multiple sites</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>What Investors Want</h3>
+      <ul>
+        <li>Real sold prices from official government records</li>
+        <li>Visual map to spot growth trends quickly</li>
+        <li>Year-over-year comparisons across districts</li>
+        <li>Breakdown by property type (houses vs flats)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-number">2</div>
+</div>
+
+<!-- Slide 3: Our Solution -->
+<div class="slide">
+  <div class="divider"></div>
+  <h2>Our Solution</h2>
+  <p>
+    A free, open-source interactive map powered entirely by <span class="highlight">official government data</span> &mdash;
+    no scraping, no paywalls, no legal risk.
+  </p>
+  <div class="grid-3" style="margin-top:40px;">
+    <div class="stat-card">
+      <div class="number">24M+</div>
+      <div class="label">Property transactions<br>(1995 &ndash; present)</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">2,800</div>
+      <div class="label">Postcode districts<br>across England &amp; Wales</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">30 yrs</div>
+      <div class="label">Of price history<br>per district</div>
+    </div>
+  </div>
+  <div class="slide-number">3</div>
+</div>
+
+<!-- Slide 4: Key Features -->
+<div class="slide">
+  <div class="divider"></div>
+  <h2>Key Features</h2>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Choropleth Map</h3>
+      <p style="font-size:18px;">Colour-coded districts showing year-over-year price growth. Blue for falling, red for rising. Spot trends at a glance.</p>
+    </div>
+    <div class="card">
+      <h3>District Details</h3>
+      <p style="font-size:18px;">Click any district to see average price, YoY change, transaction volume, and regional average days to sell.</p>
+    </div>
+    <div class="card">
+      <h3>Price Trend Charts</h3>
+      <p style="font-size:18px;">Historical price chart per district with adjustable year range. See how prices evolved over decades.</p>
+    </div>
+    <div class="card">
+      <h3>Property Type Breakdown</h3>
+      <p style="font-size:18px;">Filter by Detached, Semi-detached, Terraced, or Flats. Compare average prices by building type.</p>
+    </div>
+    <div class="card">
+      <h3>Search &amp; Navigate</h3>
+      <p style="font-size:18px;">Search by postcode or area name. The map flies to the selected district with a smooth animation.</p>
+    </div>
+    <div class="card">
+      <h3>Compare Districts</h3>
+      <p style="font-size:18px;">Side-by-side comparison of two districts. Evaluate investment targets against each other.</p>
+    </div>
+  </div>
+  <div class="slide-number">4</div>
+</div>
+
+<!-- Slide 5: Data Sources -->
+<div class="slide">
+  <div class="divider"></div>
+  <h2>Data Sources</h2>
+  <p>All data is <span class="highlight">free, legal, and open</span> under government licences.</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Source</th>
+        <th>What It Provides</th>
+        <th>Coverage</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="highlight">HM Land Registry</span></td>
+        <td>Actual sold prices, dates, property types, postcodes</td>
+        <td>England &amp; Wales, 1995&ndash;present</td>
+      </tr>
+      <tr>
+        <td><span class="highlight">Zoopla HPI</span></td>
+        <td>Regional average days to sell</td>
+        <td>11 UK regions, monthly</td>
+      </tr>
+      <tr>
+        <td><span class="highlight">OpenStreetMap</span></td>
+        <td>Map tiles for the interactive base map</td>
+        <td>Global, real-time</td>
+      </tr>
+      <tr>
+        <td><span class="highlight">postcodes.io</span></td>
+        <td>Postcode geocoding (lat/lng coordinates)</td>
+        <td>All UK postcodes</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="slide-number">5</div>
+</div>
+
+<!-- Slide 6: Architecture -->
+<div class="slide">
+  <div class="divider"></div>
+  <h2>Architecture</h2>
+  <p>No backend server required. A static site that can be hosted anywhere.</p>
+  <div style="max-width:700px; margin-top:40px;">
+    <div class="arch-box">
+      <strong>Land Registry CSV</strong><br>
+      <span style="font-size:14px; color:#94a3b8;">4.3 GB &bull; 24M+ rows &bull; Downloaded once</span>
+    </div>
+    <div class="arch-arrow">&darr;</div>
+    <div class="arch-box">
+      <strong>Node.js Processing Pipeline</strong><br>
+      <span style="font-size:14px; color:#94a3b8;">Stream CSV &rarr; Group by district &rarr; Calculate stats &rarr; Output JSON</span>
+    </div>
+    <div class="arch-arrow">&darr;</div>
+    <div class="arch-box">
+      <strong>Static Files</strong><br>
+      <span style="font-size:14px; color:#94a3b8;">districts-summary.geojson + per-district trend JSONs</span>
+    </div>
+    <div class="arch-arrow">&darr;</div>
+    <div class="arch-box">
+      <strong>React SPA</strong><br>
+      <span style="font-size:14px; color:#94a3b8;">Fetches data on demand &rarr; Leaflet choropleth &rarr; Interactive UI</span>
+    </div>
+  </div>
+  <div class="slide-number">6</div>
+</div>
+
+<!-- Slide 7: Tech Stack -->
+<div class="slide">
+  <div class="divider"></div>
+  <h2>Tech Stack</h2>
+  <div style="margin-top:20px;">
+    <h3>Frontend</h3>
+    <div>
+      <span class="tech-badge">React 19</span>
+      <span class="tech-badge">TypeScript 5.9</span>
+      <span class="tech-badge">Vite 7</span>
+      <span class="tech-badge">Tailwind CSS 4</span>
+    </div>
+    <h3>Mapping &amp; Charts</h3>
+    <div>
+      <span class="tech-badge">Leaflet</span>
+      <span class="tech-badge">React-Leaflet</span>
+      <span class="tech-badge">Recharts</span>
+    </div>
+    <h3>Data Pipeline</h3>
+    <div>
+      <span class="tech-badge">Node.js</span>
+      <span class="tech-badge">tsx</span>
+      <span class="tech-badge">csv-parser</span>
+    </div>
+    <h3>External APIs</h3>
+    <div>
+      <span class="tech-badge">OpenStreetMap Tiles</span>
+      <span class="tech-badge">postcodes.io</span>
+    </div>
+  </div>
+  <p style="margin-top:32px; font-size:18px; color:#94a3b8;">
+    All dependencies are free and open-source. Zero hosting cost on static platforms.
+  </p>
+  <div class="slide-number">7</div>
+</div>
+
+<!-- Slide 8: Market Context -->
+<div class="slide">
+  <div class="divider"></div>
+  <h2>UK Housing Market Context</h2>
+  <p style="margin-bottom:40px;">Data as of January 2026 from official sources.</p>
+  <div class="grid-3">
+    <div class="stat-card">
+      <div class="number">&pound;269,800</div>
+      <div class="label">UK average house price</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">+1.2%</div>
+      <div class="label">Annual price change</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">~40 days</div>
+      <div class="label">UK average time to sell</div>
+    </div>
+  </div>
+  <div class="grid-2" style="margin-top:40px;">
+    <div class="card">
+      <h3>Regional Variation</h3>
+      <ul>
+        <li><span class="highlight">Scotland:</span> fastest to sell (21 days avg)</li>
+        <li><span class="highlight">North West:</span> strongest growth, 6 of top 10 postcodes</li>
+        <li><span class="highlight">Wales:</span> slowest to sell (57 days avg)</li>
+        <li><span class="highlight">London:</span> highest prices but moderate growth</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Why This Tool Matters</h3>
+      <ul>
+        <li>Regional performance varies dramatically</li>
+        <li>Affordable areas are outperforming expensive ones</li>
+        <li>Investors need granular, postcode-level visibility</li>
+        <li>Our map makes these patterns visible instantly</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-number">8</div>
+</div>
+
+<!-- Slide 9: How It Works -->
+<div class="slide">
+  <div class="divider"></div>
+  <h2>User Journey</h2>
+  <div style="margin-top:20px;">
+    <div class="grid-2">
+      <div class="card">
+        <h3>1. Explore the Map</h3>
+        <p style="font-size:18px;">Open the app to see a colour-coded map of England &amp; Wales. Blue districts have falling prices, red districts have rising prices. Pan and zoom to explore.</p>
+      </div>
+      <div class="card">
+        <h3>2. Click a District</h3>
+        <p style="font-size:18px;">Click any postcode district to open the sidebar. See average price, year-over-year change, transaction count, and regional average days to sell.</p>
+      </div>
+      <div class="card">
+        <h3>3. Analyse Trends</h3>
+        <p style="font-size:18px;">View the historical price chart for the selected district. Adjust the year range to focus on specific periods. See property type breakdown.</p>
+      </div>
+      <div class="card">
+        <h3>4. Filter &amp; Compare</h3>
+        <p style="font-size:18px;">Filter by property type (Detached, Semi, Terraced, Flat). Compare two districts side by side. Search for specific postcodes or areas.</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">9</div>
+</div>
+
+<!-- Slide 10: What's Next -->
+<div class="slide">
+  <div class="divider"></div>
+  <h2>Future Roadmap</h2>
+  <div class="grid-2" style="margin-top:20px;">
+    <div class="card">
+      <h3>Short Term</h3>
+      <ul>
+        <li>EPC data integration (floor area, energy ratings)</li>
+        <li>Price-per-square-metre calculations</li>
+        <li>Links to Rightmove/Zoopla for current listings</li>
+        <li>Mobile-responsive layout</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Long Term</h3>
+      <ul>
+        <li>Rental yield estimates</li>
+        <li>Transport links and amenity scoring</li>
+        <li>Investment hotspot prediction model</li>
+        <li>Scotland coverage (Registers of Scotland)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-number">10</div>
+</div>
+
+<!-- Slide 11: Summary -->
+<div class="slide title">
+  <h1>Thank You</h1>
+  <div class="subtitle" style="margin-bottom:48px;">UK House Price Map</div>
+  <div class="grid-3" style="max-width:900px; margin:0 auto;">
+    <div class="stat-card">
+      <div class="number" style="font-size:32px;">Free &amp; Open</div>
+      <div class="label">Government data, no paywalls</div>
+    </div>
+    <div class="stat-card">
+      <div class="number" style="font-size:32px;">No Backend</div>
+      <div class="label">Static site, zero hosting cost</div>
+    </div>
+    <div class="stat-card">
+      <div class="number" style="font-size:32px;">24M+ Sales</div>
+      <div class="label">30 years of real transactions</div>
+    </div>
+  </div>
+  <div class="meta" style="margin-top:48px;">
+    <a href="https://github.com/vsohr/openmap-house-prices" style="color:#38bdf8; text-decoration:none;">
+      github.com/vsohr/openmap-house-prices
+    </a>
+  </div>
+  <div class="slide-number">11</div>
+</div>
+
+</body>
+</html>

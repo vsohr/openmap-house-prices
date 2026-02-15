@@ -29,3 +29,4 @@ dist-ssr
 # Large data files
 *.csv
 public/data/
+scripts/raw-data/

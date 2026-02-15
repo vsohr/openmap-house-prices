@@ -1,21 +1,49 @@
 import { AppProvider } from './context/AppContext';
+import { MapView } from './components/Map';
+import { Sidebar } from './components/Sidebar';
+import { FilterBar } from './components/Controls';
+import { MapHeader } from './components/MapHeader';
+import { ComparePanel } from './components/ComparePanel';
+import { useDistrictData } from './hooks/useDistrictData';
 
-function App() {
-  return (
-    <AppProvider>
-      <div className="h-screen w-screen flex flex-col">
-        <header className="bg-slate-800 text-white p-4">
-          <h1 className="text-xl font-bold">UK House Price Map</h1>
-        </header>
-        <main className="flex-1 flex">
-          <div className="flex-1">{/* Map will go here */}</div>
-          <aside className="w-80 bg-white border-l border-gray-200 p-4">
-            {/* Sidebar will go here */}
-          </aside>
-        </main>
+function AppContent() {
+  const { data, loading, error } = useDistrictData();
+
+  if (error) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p className="text-red-600">Error: {error}</p>
       </div>
-    </AppProvider>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-screen flex-col">
+      <MapHeader data={data} />
+      <div className="flex flex-1 overflow-hidden">
+        <div className="flex-1">
+          <MapView data={data} />
+        </div>
+        <Sidebar />
+      </div>
+      <ComparePanel />
+      <FilterBar />
+    </div>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <AppProvider>
+      <AppContent />
+    </AppProvider>
+  );
+}

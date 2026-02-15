@@ -31,11 +31,6 @@ export function DistrictSummary({ trend }: DistrictSummaryProps) {
           {formatCurrency(latest.avgPrice)}
         </dd>
 
-        <dt className="text-gray-500">Median Price</dt>
-        <dd className="font-semibold text-gray-900">
-          {formatCurrency(latest.medianPrice)}
-        </dd>
-
         <dt className="text-gray-500">YoY Change</dt>
         <dd
           className={`font-semibold ${

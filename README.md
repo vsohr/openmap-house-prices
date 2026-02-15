@@ -1,73 +1,72 @@
-# React + TypeScript + Vite
+# UK House Price Map
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interactive choropleth map showing house price trends across England & Wales, powered by HM Land Registry Price Paid Data (~24M transactions, 1995-present).
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Choropleth map colored by year-over-year price growth across ~2,800 postcode districts
+- Click any district for detailed stats, trend charts, and property type breakdowns
+- Search by postcode or area name
+- Filter by property type (Detached, Semi, Terraced, Flat) and year range
+- Compare two districts side-by-side
+- View recent sales with map markers
 
-## React Compiler
+## Quick Start
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run data:sample   # Generate sample data for 8 districts
+npm run dev           # Start dev server at http://localhost:5173
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Full Data Setup
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+To use real Land Registry data instead of sample data:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+1. **Download raw data** (~4.3GB CSV + postcode polygon GeoJSON):
+   ```bash
+   npm run data:download
+   ```
+   This downloads `pp-complete.csv` from HM Land Registry and clones UK postcode polygon boundaries into `scripts/raw-data/`.
+
+2. **Process into static files:**
+   ```bash
+   npm run data:process
+   ```
+   This streams the CSV, groups by postcode district, and outputs:
+   - `public/data/districts-summary.geojson` — all districts with summary stats
+   - `public/data/trends/{code}.json` — yearly trend data per district
+   - `public/data/sales/{code}.json` — recent sales per district
+
+3. **Run the app:**
+   ```bash
+   npm run dev
+   ```
+
+> Raw data files (`scripts/raw-data/`, `*.csv`, `public/data/`) are gitignored. Each developer needs to run the data pipeline locally.
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Vite dev server with HMR |
+| `npm run build` | TypeScript check + production build |
+| `npm run lint` | ESLint on all `.ts`/`.tsx` files |
+| `npm run preview` | Preview production build |
+| `npm run data:download` | Download Land Registry CSV + polygon data |
+| `npm run data:process` | Process raw data into static JSON/GeoJSON |
+| `npm run data:sample` | Generate sample data for development |
+
+## Tech Stack
+
+- React 19, TypeScript 5.9, Vite 7
+- Leaflet + react-leaflet for mapping
+- Recharts for charts
+- Tailwind CSS 4
+- Node.js scripts with tsx for data processing
+
+## Data Sources
+
+- [HM Land Registry Price Paid Data](https://www.gov.uk/government/statistical-data-sets/price-paid-data-downloads) — transaction records for England & Wales
+- [postcodes.io](https://postcodes.io/) — free UK postcode geocoding API
+- [OpenStreetMap](https://www.openstreetmap.org/) — map tiles
